@@ -123,7 +123,8 @@ def Plot_Value_Diff(data):
 
 
 if __name__ == "__main__":
-	filename = "data\CMDP\_nC_4_nA_4_H_4_CtxModel_0_20180329-230654" + ".p"
+	filename = "data\CMDP\_nC_4_nA_4_H_4_CtxModel_0_20180402-163440" + ".p"
+	filename = "data\C_PACE\_nC_4_nA_4_H_4_CtxModel_0_20180331-234255" + ".p"
 	data = Read_Data(filename)
 	# Plot_Known_States_Num(data)
 	# Plot_Trans_Prob_Diff(data)

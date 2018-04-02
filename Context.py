@@ -1,9 +1,14 @@
 import numpy as np
 
 def generate_uniform_context(nC):
-	c = np.random.rand(nC)
-	c /= np.sum(c)
+	c = np.random.rand(nC)/nC
+	c[-1] = 1 - np.sum(c[:-1])
 	return c
+
+# def generate_uniform_context(nC):
+# 	c = np.random.rand(nC)
+# 	c /= np.sum(c)
+# 	return c
 
 # def generate_uniform_context_with_redundant_dim(nC):
 # 	"""

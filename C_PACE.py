@@ -102,13 +102,13 @@ class C_PACE:
 			# 	c_t = generate_uniform_context(self.nC)
 
 			self.MDP.Generate_CMDP(c_t)
-			s = self.MDP.reset()
+			s_0 = s = self.MDP.reset()
 
 			goal_trans_prob, goal_rew = self.MDP.Get_Trans_Prob_Rew()
 			goal_policy, goal_value = Optimal_Control(goal_trans_prob, goal_rew, self.H)
 			policy, value = self.Optimal_Control(c_t)
 
-			init_state_value_diff = goal_value[0, s] - value[0, s]
+			init_state_value_diff = goal_value[0, s] * self.H - value[0, s]
 
 			num_known = self.H
 			num_wrong_action = 0
@@ -136,7 +136,7 @@ class C_PACE:
 				if done:
 					break
 
-			epi_rew_diff = goal_value[0, s] - total_eps_rew
+			epi_rew_diff = goal_value[0, s_0] - total_eps_rew
 			self.episode_history.append([init_state_value_diff, num_wrong_action, epi_rew_diff])
 			data_2_store = self.episode_history
 

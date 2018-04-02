@@ -7,14 +7,6 @@ from CMDP_metric import *
 from Simple_MDP import *
 from Context import *
 
-def Read_KWIK_LR_value(filename):
-	if filename is None:
-		return None
-	data = Read_Data(filename)
-	last_LR_history = data[-1][3]
-	KWIK_LR_value = last_LR_history[0:4]
-
-
 class CMDP:
 	def __init__(self, MDP, episode = int(1e4), CtxModel = 0,
 				 eps = 0.1, delta = 0.1,
@@ -80,7 +72,7 @@ class CMDP:
 			# 	c_t = generate_uniform_context(self.nC)
 
 			self.MDP.Generate_CMDP(c_t)
-			s = self.MDP.reset()
+			s_0 = s = self.MDP.reset()
 			
 			goal_trans_prob, goal_rew = self.MDP.Get_Trans_Prob_Rew()
 			LR_trans_prob, LR_rew = self.LR_MDP.GenertaeMDP(c_t)
@@ -117,7 +109,7 @@ class CMDP:
 				if done:
 					break
 
-			optimal_eps_rew = goal_value[0, s] * self.H
+			optimal_eps_rew = goal_value[0, s_0] * self.H
 			epi_rew_diff = optimal_eps_rew - total_eps_rew
 			
 			self.episode_history.append([init_state_value_diff, num_wrong_action, epi_rew_diff])
