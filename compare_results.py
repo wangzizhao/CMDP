@@ -1,0 +1,172 @@
+import numpy as np 
+import matplotlib.pyplot as plt 
+import pickle
+
+from KIWK_LR_Rmax import *
+
+
+
+def Running_Average(data):
+	"""
+	data: list or numpy array
+	average_scope: int 
+	"""
+	averaged_data = []
+	average_scope = 500
+	running_sum = np.sum(data[:average_scope])
+	for i in range(len(data) - average_scope):
+		averaged_data.append(running_sum/average_scope)
+		running_sum += data[i+average_scope] - data[i]
+	averaged_data.append(running_sum/average_scope)
+	return averaged_data
+
+
+def Read_Data(filename):
+	if filename is None:
+		return None
+	print("loading data...")
+	with (open(filename, "rb")) as f:
+		data = pickle.load(f)
+	print("len of data:", len(data))
+	return data
+
+
+def Plot_Trans_Prob_Diff(data):
+	trans_prob_diff_sum = data[5]
+	plt.plot(range(len(trans_prob_diff_sum)), trans_prob_diff_sum)
+	plt.title("trans_prob_diff_sum")
+	plt.show()
+
+def Plot_Rew_Diff(data):
+	rew_histroy = data[6]
+	rew_diff_sum = [i[0] for i in rew_histroy]
+	rew_diff_sum_ra = Running_Average(rew_diff_sum)
+
+	f, ax = plt.subplots(1, 2)
+	ax[0].plot(range(len(rew_diff_sum)), rew_diff_sum)
+	ax[0].set_title("rew_diff_sum")
+	ax[1].plot(range(len(rew_diff_sum_ra)), rew_diff_sum_ra)
+	ax[1].set_title("rew_diff_sum Running Average")
+	plt.show()
+
+def Plot_Policy_Diff(data):
+	policy_diff = data[7]
+	policy_diff_ra = Running_Average(policy_diff)
+
+	f, ax = plt.subplots(1, 2)
+	ax[0].plot(range(len(policy_diff)), policy_diff)
+	ax[0].set_title("policy_diff")
+	ax[1].plot(range(len(policy_diff_ra)), policy_diff_ra)
+	ax[1].set_title("policy_diff Running Average")
+	plt.show()
+
+
+def Plot_Known_States_Num(data):
+	# alpha_s_prob = data[0]
+	# alpha_s_rew = data[1]
+	# c_t_history = data[2]
+	Q_probs = [LR_history[0] for LR_history in data[3]]
+	# Q_rews = [LR_history[2] for LR_history in data[3]]
+	nS = Q_probs[0].shape[0]
+	nA = Q_probs[0].shape[1]
+
+	is_state_action_pair_known = [LR_history[4] for LR_history in data[3]]
+	num_known_state_action_pair = [np.sum(is_known) for is_known in is_state_action_pair_known]
+	num_known_state_action_pair_ra = Running_Average(num_known_state_action_pair)
+
+	print(nS, nA)
+
+	f, ax = plt.subplots(1, 2)
+	ax[0].plot(range(len(num_known_state_action_pair)), num_known_state_action_pair)
+	ax[0].set_title("num_known_state_action_pair")
+	ax[1].plot(range(len(num_known_state_action_pair_ra)), num_known_state_action_pair_ra)
+	ax[1].set_title("num_known_state_action_pair Running Average")
+	plt.show()
+
+def Plot_Wrong_Action_Num(data):
+	# print("episode_history len", len(data[4]))
+	all_num_wrong_action_ra = []
+	for i in [0]:
+		num_wrong_action = [episode_history[1] for episode_history in data[i][4]]
+		all_num_wrong_action_ra.append(Running_Average(num_wrong_action))
+	for i in [1]:
+		num_wrong_action = [episode_history[0] for episode_history in data[i][4]]
+		all_num_wrong_action_ra.append(Running_Average(num_wrong_action))
+	plt.plot(range(len(all_num_wrong_action_ra[0])), all_num_wrong_action_ra[0])
+	plt.plot(range(len(all_num_wrong_action_ra[1])), all_num_wrong_action_ra[1])
+	plt.xlabel("episode")
+	plt.legend(["keep_updating = False", "keep_updating = True"])
+	plt.title('num_wrong_action Running Average')
+	# f, ax = plt.subplots(2)
+	# f.suptitle('num_wrong_action Running Average')
+	# for i in range(2):
+	# 	ax[i].plot(range(len(all_num_wrong_action_ra[i])), all_num_wrong_action_ra[i])
+	# for ax in ax.flat:
+	# 	ax.set(xlabel='episode')
+	# ax[2].plot(range(len(num_total_wrong_action)), num_total_wrong_action)
+	# ax[2].set_title("num_total_wrong_action")
+	plt.show()
+
+def Plot_Eps_Rew_Diff(data):
+	all_eps_rew_diff_ra = []
+	for i in [0]:
+		total_eps_rew = [episode_history[3] for episode_history in data[i][4]]
+		optimal_eps_rew = [episode_history[4] for episode_history in data[i][4]]
+		eps_rew_diff = np.subtract(optimal_eps_rew, total_eps_rew)
+		all_eps_rew_diff_ra.append(Running_Average(eps_rew_diff))
+	for i in [1]:
+		total_eps_rew = [episode_history[2] for episode_history in data[i][4]]
+		optimal_eps_rew = [episode_history[3] for episode_history in data[i][4]]
+		eps_rew_diff = np.subtract(optimal_eps_rew, total_eps_rew)
+		all_eps_rew_diff_ra.append(Running_Average(eps_rew_diff))
+	plt.plot(range(len(all_eps_rew_diff_ra[0])), all_eps_rew_diff_ra[0])
+	plt.plot(range(len(all_eps_rew_diff_ra[1])), all_eps_rew_diff_ra[1])
+	plt.xlabel("episode")
+	plt.legend(["keep_updating = False", "keep_updating = True"])
+	plt.title('eps_rew_diff Running Average')
+	# f, ax = plt.subplots(2)
+	# f.suptitle('eps_rew_diff Running Average')
+	# for i in range(2):
+	# 	ax[i].plot(range(len(all_eps_rew_diff_ra[i])), all_eps_rew_diff_ra[i])
+	# for ax in ax.flat:
+	# 	ax.set(xlabel='episode')
+	plt.show()
+
+def Plot_Value_Diff(data):
+	all_init_state_value_diff_ra = []
+	for i in range(2):
+		init_state_value_diff = data[i][8]
+		all_init_state_value_diff_ra.append(Running_Average(init_state_value_diff))
+	plt.plot(range(len(all_init_state_value_diff_ra[0])), all_init_state_value_diff_ra[0])
+	plt.plot(range(len(all_init_state_value_diff_ra[1])), all_init_state_value_diff_ra[1])
+	plt.xlabel("episode")
+	plt.legend(["keep_updating = False", "keep_updating = True"])
+	plt.title('init_state_value_diff Running Average')
+	# f, ax = plt.subplots(2)
+	# f.suptitle('init_state_value_diff Running Average')
+	# for i in range(2):
+	# 	ax[i].plot(range(len(all_init_state_value_diff_ra[i])), all_init_state_value_diff_ra[i])
+	# for ax in ax.flat:
+	# 	ax.set(xlabel='episode')
+	plt.show()
+
+
+if __name__ == "__main__":
+	filename1 = "data\CMDP_nAdv_2_ndS_4_b1_prob_1.0_b2_prob_10.0_b1_rew_1.0_b2_rew_10.0_20180314-140824" + ".p"
+	filename2 = "data\CMDP_keep_updating_True_nAdv_2_ndS_4_b1_prob_1.0_b2_prob_10.0_b1_rew_1.0_b2_rew_10.0_20180315-103810" + ".p"
+	# filename3 = "data\CMDP_nAdv_2_ndS_4_b1_prob_1.0_b2_prob_10.0_b1_rew_1.0_b2_rew_10.0_20180315-010629" + ".p"
+	# filename4 = "data\CMDP_nAdv_2_ndS_4_b1_prob_1.0_b2_prob_10.0_b1_rew_1.0_b2_rew_10.0_20180315-010655" + ".p"
+	data1 = Read_Data(filename1)
+	data2 = Read_Data(filename2)
+	# data3 = Read_Data(filename3)
+	# data4 = Read_Data(filename4)
+	data = [data1, data2]
+
+	# Plot_Known_States_Num(data)
+	# Plot_Trans_Prob_Diff(data)
+	# Plot_Rew_Diff(data)
+	# Plot_Policy_Diff(data)
+
+	Plot_Wrong_Action_Num(data)
+	Plot_Eps_Rew_Diff(data)
+	Plot_Value_Diff(data)
