@@ -90,14 +90,14 @@ class C_PACE:
 	def Conduct(self):
 		for epi in range(self.episode):
 
-			c_t = generate_uniform_context(self.nC)
+			# c_t = generate_uniform_context(self.nC)
 
 			if self.CtxModel == 0:
 				c_t = generate_uniform_context(self.nC)
 			# elif self.CtxModels == 1:
 			# 	c_t = generate_uniform_context_with_redundant_dim(self.nC)
-			# elif self.CtxModels == 2:
-			# 	c_t = generate_uniform_context(self.nC)
+			elif self.CtxModels == 2:
+				c_t = generate_binodal_context(self.nC, epi, self.episode)
 			# elif self.CtxModels == 3:
 			# 	c_t = generate_uniform_context(self.nC)
 
@@ -151,6 +151,6 @@ class C_PACE:
 if __name__ == "__main__":
 	MDP = simple_MDP(nC = 4, nA = 4, H = 4, e = 0.3)
 
-	test1 = C_PACE(MDP, episode = int(1e5),
-				k = 20, L_Q = 5, eps_d = 0.25)
+	test1 = C_PACE(MDP, episode = int(2e5),
+				k = 100, L_Q = 10, eps_d = 0.2)
 	test1.Conduct()

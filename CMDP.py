@@ -66,8 +66,8 @@ class CMDP:
 				c_t = generate_uniform_context(self.nC)
 			# elif self.CtxModel == 1:
 			# 	c_t = generate_uniform_context_with_redundant_dim(self.nC)
-			# elif self.CtxModel == 2:
-			# 	c_t = generate_uniform_context(self.nC)
+			elif self.CtxModels == 2:
+				c_t = generate_binodal_context(self.nC, epi, self.episode)
 			# elif self.CtxModel == 3:
 			# 	c_t = generate_uniform_context(self.nC)
 

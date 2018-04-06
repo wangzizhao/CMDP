@@ -7,7 +7,7 @@ def generate_uniform_context(nC):
 
 # def generate_uniform_context(nC):
 # 	c = np.random.rand(nC)
-# 	c /= np.sum(c)
+	c /= np.sum(c)
 # 	return c
 
 # def generate_uniform_context_with_redundant_dim(nC):
@@ -24,17 +24,15 @@ def generate_uniform_context(nC):
 # 	c[5] = 1 - np.sum(rand)
 # 	return c
 
-# def generate_binodal_context(epi):
-# 	"""
-# 	Assume nAdv = 2
-# 	First half of all episodes: c_t = (rand/nAdv, 0, 1 - sum(c_t[0:2]))
-# 	Second half of all episodes: c_t = (rand/nAdv, rand/nAdv, 1 - sum(c_t[0:2]))
-# 	"""
-# 	assert(self.nAdv == 2)
-# 	c = np.random.rand(nC)/self.nAdv
-# 	if 2 * epi < self.episode:
-# 		c[1] = c[1]/2
-# 	else:
-# 		c[1] = c[1]/2 + 0.5/self.nAdv
-# 	c[-1] = 1 - np.sum(c[:-1])
-# 	return c
+def generate_binodal_context(nC, epi, episode):
+	"""
+	First half of all episodes: c_t = (rand/nAdv, 0, 1 - sum(c_t[0:2]))
+	Second half of all episodes: c_t = (rand/nAdv, rand/nAdv, 1 - sum(c_t[0:2]))
+	"""
+	c = np.random.rand(nC)/nC
+	if 2 * epi < episode:
+		c[0] = c[0]/2
+	else:
+		c[0] = c[0]/2 + 0.5/nC
+	c[-1] = 1 - np.sum(c[:-1])
+	return c
